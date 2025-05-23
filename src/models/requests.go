@@ -7,3 +7,7 @@ type CreateShortURLRequest struct {
 	ShortCode   string     `json:"shortCode,omitempty"`
 	ExpiresAt   *time.Time `json:"expiresAt,omitempty"`
 }
+
+type GetOriginalURLRequest struct {
+	ShortCode string `json:"shortCode" validate:"required"`
+}
