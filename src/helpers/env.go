@@ -44,7 +44,9 @@ func LoadEnvFile(filepath string) {
 
 func LoadConfigFromEnv() *configs.Config {
 	return &configs.Config{
-		MongoURI: os.Getenv("MONGO_URI"),
-		BaseURL:  os.Getenv("BASE_URL"),
+		MongoURI:                    os.Getenv("MONGO_URI"),
+		MongoURLShortenerDatabase:   os.Getenv("MONGO_URL_SHORTENER_DATABASE"),
+		MongoURLShortenerCollection: os.Getenv("MONGO_URL_SHORTENER_COLLECTION"),
+		BaseURL:                     os.Getenv("BASE_URL"),
 	}
 }

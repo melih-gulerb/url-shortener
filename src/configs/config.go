@@ -1,6 +1,8 @@
 package configs
 
 type Config struct {
-	MongoURI string
-	BaseURL  string
+	MongoURI                    string
+	MongoURLShortenerDatabase   string
+	MongoURLShortenerCollection string
+	BaseURL                     string
 }

@@ -8,9 +8,8 @@ import (
 func ResponseBodyLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		req := c.Request()
-		res := c.Response()
 
-		logging.Default().Info(req.Method, req.URL.Path, res.Status)
+		logging.Default().Info(req.Method, req.URL)
 
 		err := next(c)
 

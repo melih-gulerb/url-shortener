@@ -11,12 +11,14 @@ import (
 )
 
 type URLHandler struct {
-	repo *repositories.URLRepository
+	repo    *repositories.URLRepository
+	baseUrl string
 }
 
-func NewURLHandler(repo *repositories.URLRepository) *URLHandler {
+func NewURLHandler(repo *repositories.URLRepository, baseUrl string) *URLHandler {
 	return &URLHandler{
-		repo: repo,
+		repo:    repo,
+		baseUrl: baseUrl,
 	}
 }
 
@@ -63,7 +65,7 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 	shortCode, err = h.repo.GetShortCodeByOriginalURL(c.Request().Context(), req.OriginalUrl)
 	if shortCode != "" {
 		return c.JSON(http.StatusOK, models.BaseResponse{
-			Data:    shortCode,
+			Data:    h.baseUrl + "/" + shortCodeToUse,
 			Message: models.Messages.Success,
 		})
 	}
@@ -78,7 +80,7 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, models.BaseResponse{
-		Data:    shortCode,
+		Data:    h.baseUrl + "/" + shortCodeToUse,
 		Message: models.Messages.Success,
 	})
 }

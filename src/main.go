@@ -16,11 +16,13 @@ func main() {
 	mongo := configs.InitializeMongo(cfg.MongoURI)
 	echo := configs.InitializeEcho()
 
-	urlRepository := repositories.NewURLRepository(mongo.Database("urls"), "urls")
-	urlHandler := handlers.NewURLHandler(urlRepository)
+	urlRepository := repositories.NewURLRepository(mongo.Database(cfg.MongoURLShortenerDatabase), cfg.MongoURLShortenerCollection)
+	urlHandler := handlers.NewURLHandler(urlRepository, cfg.BaseURL)
 
 	echo.Use(middleware.Recover())
 	echo.Use(middlewares.ResponseBodyLogger)
 	echo.POST("/shorten", urlHandler.CreateShortURL)
 	echo.POST("/original", urlHandler.GetOriginalURL)
+
+	echo.Logger.Fatal(echo.Start(":1323"))
 }
