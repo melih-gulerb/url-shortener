@@ -1,0 +1,61 @@
+{
+  "version": 3,
+  "port": 8080,
+  "cache_ttl": "300s",
+  "timeout": "3s",
+  "extra_config": {
+    "security/cors": {
+      "allow_origins": ["*"],
+      "allow_methods": ["GET", "POST", "PUT", "DELETE"],
+      "allow_headers": ["Origin", "Authorization", "Content-Type", "Accept"],
+      "expose_headers": ["Content-Length"],
+      "max_age": "12h",
+      "allow_credentials": true
+    }
+  },
+  "endpoints": [
+    {
+      "endpoint": "/api/shorten",
+      "method": "POST",
+      "output_encoding": "json",
+      "extra_config": {
+        "qos/ratelimit/endpoint": {
+          "max_rate": 5,
+          "capacity": 10,
+          "every": "1m",
+          "strategy": "client",
+          "key": "X-Client-ID"
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/shorten",
+          "encoding": "json",
+          "method": "POST",
+          "host": ["http://url-shortener-api:1323"]
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/original",
+      "method": "POST",
+      "output_encoding": "json",
+      "extra_config": {
+        "qos/ratelimit/endpoint": {
+          "max_rate": 2,
+          "capacity": 2,
+          "every": "1m",
+          "strategy": "ip"
+        }
+      },
+      "backend": [
+        {
+          "url_pattern": "/original",
+          "encoding": "json",
+          "method": "POST",
+          "host": ["http://url-shortener-api:1323"]
+        }
+      ]
+    }
+  ]
+}

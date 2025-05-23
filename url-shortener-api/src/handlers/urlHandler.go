@@ -4,7 +4,7 @@ import (
 	"github.com/melih-gulerb/go-logger/logging"
 	"net/http"
 	"url-shortener/src/helpers"
-	"url-shortener/src/models"
+	models2 "url-shortener/src/models"
 	"url-shortener/src/repositories"
 
 	"github.com/labstack/echo/v4"
@@ -23,18 +23,18 @@ func NewURLHandler(repo *repositories.URLRepository, baseUrl string) *URLHandler
 }
 
 func (h *URLHandler) CreateShortURL(c echo.Context) error {
-	req := new(models.CreateShortURLRequest)
+	req := new(models2.CreateShortURLRequest)
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.BaseResponse{
+		return c.JSON(http.StatusBadRequest, models2.BaseResponse{
 			Data:    nil,
-			Message: models.Messages.FailedToCreateShortCode,
+			Message: models2.Messages.FailedToCreateShortCode,
 		})
 	}
 
 	if req.OriginalUrl == "" {
-		return c.JSON(http.StatusBadRequest, models.BaseResponse{
+		return c.JSON(http.StatusBadRequest, models2.BaseResponse{
 			Data:    nil,
-			Message: models.Messages.OriginalURLCannotBeEmpty,
+			Message: models2.Messages.OriginalURLCannotBeEmpty,
 		})
 	}
 
@@ -48,7 +48,7 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 		}
 	}
 
-	urlDoc := &models.UrlCollection{
+	urlDoc := &models2.UrlCollection{
 		OriginalUrl: req.OriginalUrl,
 		ShortCode:   shortCodeToUse,
 		AccessCount: 0,
@@ -56,47 +56,47 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 
 	shortCode, err := h.repo.GetOriginalURLByShortCode(c.Request().Context(), shortCodeToUse)
 	if shortCode != "" && req.ShortCode != "" {
-		return c.JSON(http.StatusBadRequest, models.BaseResponse{
+		return c.JSON(http.StatusBadRequest, models2.BaseResponse{
 			Data:    nil,
-			Message: models.Messages.ShortCodeAlreadyExists,
+			Message: models2.Messages.ShortCodeAlreadyExists,
 		})
 	}
 
 	shortCode, err = h.repo.GetShortCodeByOriginalURL(c.Request().Context(), req.OriginalUrl)
 	if shortCode != "" {
-		return c.JSON(http.StatusOK, models.BaseResponse{
+		return c.JSON(http.StatusOK, models2.BaseResponse{
 			Data:    h.baseUrl + "/" + shortCodeToUse,
-			Message: models.Messages.Success,
+			Message: models2.Messages.Success,
 		})
 	}
 
 	_, err = h.repo.Insert(c.Request().Context(), urlDoc)
 	if err != nil {
 		logging.Default().Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, models.BaseResponse{
+		return c.JSON(http.StatusInternalServerError, models2.BaseResponse{
 			Data:    nil,
-			Message: models.Messages.FailedToCreateShortCode,
+			Message: models2.Messages.FailedToCreateShortCode,
 		})
 	}
 
-	return c.JSON(http.StatusCreated, models.BaseResponse{
+	return c.JSON(http.StatusCreated, models2.BaseResponse{
 		Data:    h.baseUrl + "/" + shortCodeToUse,
-		Message: models.Messages.Success,
+		Message: models2.Messages.Success,
 	})
 }
 
 func (h *URLHandler) GetOriginalURL(c echo.Context) error {
-	req := new(models.GetOriginalURLRequest)
+	req := new(models2.GetOriginalURLRequest)
 	if err := c.Bind(req); err != nil {
-		return c.JSON(http.StatusBadRequest, models.BaseResponse{
-			Message: models.Messages.FailedToGetOriginalURL,
+		return c.JSON(http.StatusBadRequest, models2.BaseResponse{
+			Message: models2.Messages.FailedToGetOriginalURL,
 			Data:    nil,
 		})
 	}
 
 	if req.ShortCode == "" {
-		return c.JSON(http.StatusBadRequest, models.BaseResponse{
-			Message: models.Messages.ShortCodeCannotBeEmpty,
+		return c.JSON(http.StatusBadRequest, models2.BaseResponse{
+			Message: models2.Messages.ShortCodeCannotBeEmpty,
 			Data:    nil,
 		})
 	}
@@ -104,20 +104,20 @@ func (h *URLHandler) GetOriginalURL(c echo.Context) error {
 	originalUrl, err := h.repo.GetOriginalURLByShortCode(c.Request().Context(), req.ShortCode)
 	if err != nil {
 		logging.Default().Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, models.BaseResponse{
-			Message: models.Messages.FailedToGetOriginalURL,
+		return c.JSON(http.StatusInternalServerError, models2.BaseResponse{
+			Message: models2.Messages.FailedToGetOriginalURL,
 			Data:    nil,
 		})
 	}
 
 	if originalUrl == "" {
-		return c.JSON(http.StatusNotFound, models.BaseResponse{
-			Message: models.Messages.OriginalURLNotFound,
+		return c.JSON(http.StatusNotFound, models2.BaseResponse{
+			Message: models2.Messages.OriginalURLNotFound,
 		})
 	}
 
-	return c.JSON(http.StatusOK, models.BaseResponse{
+	return c.JSON(http.StatusOK, models2.BaseResponse{
 		Data:    originalUrl,
-		Message: models.Messages.Success,
+		Message: models2.Messages.Success,
 	})
 }

@@ -1,0 +1,28 @@
+services:
+  url-shortener-api:
+    build:
+      context: ./url-shortener-api
+      dockerfile: Dockerfile
+    container_name: url-shortener-api-service
+    ports:
+      - "1323:1323"
+    networks:
+      - krakend_network
+    restart: unless-stopped
+
+  krakend:
+    image: devopsfaith/krakend:latest
+    container_name: krakend-gateway-service
+    volumes:
+      - ./krakend/krakend.json:/etc/krakend/krakend.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - url-shortener-api
+    networks:
+      - krakend_network
+    restart: unless-stopped
+
+networks:
+  krakend_network:
+    driver: bridge
