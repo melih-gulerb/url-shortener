@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/labstack/echo/v4/middleware"
 	"url-shortener/src/configs"
 	"url-shortener/src/handlers"
 	"url-shortener/src/helpers"
+	"url-shortener/src/middlewares"
 	"url-shortener/src/repositories"
 )
 
@@ -17,5 +19,8 @@ func main() {
 	urlRepository := repositories.NewURLRepository(mongo.Database("urls"), "urls")
 	urlHandler := handlers.NewURLHandler(urlRepository)
 
+	echo.Use(middleware.Recover())
+	echo.Use(middlewares.ResponseBodyLogger)
 	echo.POST("/shorten", urlHandler.CreateShortURL)
+	echo.POST("/original", urlHandler.GetOriginalURL)
 }

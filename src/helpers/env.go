@@ -45,5 +45,6 @@ func LoadEnvFile(filepath string) {
 func LoadConfigFromEnv() *configs.Config {
 	return &configs.Config{
 		MongoURI: os.Getenv("MONGO_URI"),
+		BaseURL:  os.Getenv("BASE_URL"),
 	}
 }

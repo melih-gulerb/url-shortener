@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/melih-gulerb/go-logger/logging"
 	"net/http"
 	"url-shortener/src/helpers"
 	"url-shortener/src/models"
@@ -69,6 +70,7 @@ func (h *URLHandler) CreateShortURL(c echo.Context) error {
 
 	_, err = h.repo.Insert(c.Request().Context(), urlDoc)
 	if err != nil {
+		logging.Default().Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, models.BaseResponse{
 			Data:    nil,
 			Message: models.Messages.FailedToCreateShortCode,
@@ -99,6 +101,7 @@ func (h *URLHandler) GetOriginalURL(c echo.Context) error {
 
 	originalUrl, err := h.repo.GetOriginalURLByShortCode(c.Request().Context(), req.ShortCode)
 	if err != nil {
+		logging.Default().Error(err.Error())
 		return c.JSON(http.StatusInternalServerError, models.BaseResponse{
 			Message: models.Messages.FailedToGetOriginalURL,
 			Data:    nil,
